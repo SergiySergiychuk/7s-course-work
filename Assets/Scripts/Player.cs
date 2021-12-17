@@ -2,14 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-
-
-public class PlayerMove : MonoBehaviour
+public class Player : MonoBehaviour
 {
-    public float moveSpeed;
+    public static float moveSpeed;
     public float sideWaysSpeed = 4;
     public float jumpSpeed = 10;
-
     public bool isGrounded = true;
 
     public bool isGoingUp = false;
@@ -17,15 +14,17 @@ public class PlayerMove : MonoBehaviour
     float minY = 2.67f;
     public bool isGoingDown = true;
     public static int frameCount = 0;
-    // Start is called before the first frame update
+
+    public static Vector3 position;
+
     void Start()
     {
-        moveSpeed = 10;
+        moveSpeed = 7;
     }
 
-    // Update is called once per frame
     void Update()
     {
+        position = transform.position;
         if (frameCount % 300 == 0)
         {
             moveSpeed += 1;
@@ -49,9 +48,9 @@ public class PlayerMove : MonoBehaviour
 
     void Jump()
     {
-        float x = gameObject.transform.position.x;
-        float y = gameObject.transform.position.y;
-        float z = gameObject.transform.position.z;
+        float x = position.x;
+        float y = position.y;
+        float z = position.z;
         if (isGoingUp && y < maxY)
         {
             transform.Translate(Vector3.up * Time.deltaTime * jumpSpeed);
@@ -67,5 +66,13 @@ public class PlayerMove : MonoBehaviour
             isGoingUp = false;
         }
         
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.tag == "obstacle")
+        {
+            FindObjectOfType<GameManager>().EndGame();
+        }
     }
 }
