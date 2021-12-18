@@ -11,7 +11,10 @@ public class LevelBoundary : MonoBehaviour
 
     void Update()
     {
-        intetnalLeft = leftSide;
-        internalRight = rightSide;
+        if ((Player.position.x < leftSide || Player.position.x > rightSide) && Player.moveSpeed != 0)
+        {
+            FindObjectOfType<GameManager>().EndGame();
+            Debug.Log("Dead at x=" + Player.position.x);
+        }
     }
 }

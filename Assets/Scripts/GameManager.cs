@@ -15,15 +15,23 @@ public class GameManager : MonoBehaviour
     public Text scoreText;
     public Text gameOverText;
     public Text coinsCountText;
+    public Text startCounterText;
+    public static int frameCount = 0;
+    void Start()
+    {
+        StartCoroutine(StartGame());
+    }
+
     void Update()
     {
         scoreText.text = (Player.position.z + 23.41).ToString("0");
         coinsCountText.text = coinsCount.ToString();
-        if(creatingSection == false)
+        if (creatingSection == false)
         {
             creatingSection = true;
             StartCoroutine(GenerateSection());
         }
+        frameCount += 1;
     }
 
     IEnumerator GenerateSection()
@@ -35,6 +43,19 @@ public class GameManager : MonoBehaviour
         creatingSection = false;
     }
 
+    public IEnumerator StartGame()
+    {
+        yield return new WaitForSeconds(1);
+        startCounterText.text = "2";
+        yield return new WaitForSeconds(1);
+        startCounterText.text = "1";
+        yield return new WaitForSeconds(1);
+        startCounterText.text = "GO!";
+        yield return new WaitForSeconds(1);
+        startCounterText.text = "";
+        Player.moveSpeed = 7;
+    }
+
     public void EndGame()
     {
         if (gameHasEnded == false)
@@ -44,6 +65,7 @@ public class GameManager : MonoBehaviour
 
             // TODO add death animation
             Player.moveSpeed = 0;
+            frameCount = 0;
             Invoke("RestartGame", 2f);
         }
     }

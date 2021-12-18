@@ -2,35 +2,37 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum VerticalState
+{
+    Idle,
+    GoingUp,
+    GoingDown
+}
 public class Player : MonoBehaviour
 {
     public static float moveSpeed;
     public float sideWaysSpeed = 4;
     public float jumpSpeed = 10;
-    public bool isGrounded = true;
 
-    public bool isGoingUp = false;
+    public VerticalState verticalState = VerticalState.Idle;
     private float maxY = 7f;
     float minY = 2.67f;
-    public bool isGoingDown = true;
-    public static int frameCount = 0;
 
     public static Vector3 position;
 
     void Start()
     {
-        moveSpeed = 7;
     }
 
     void Update()
     {
         position = transform.position;
-        if (frameCount % 300 == 0)
+        if (position.z % 20 == 0)
         {
             moveSpeed += 1;
         }
         transform.Translate(Vector3.forward * Time.deltaTime * moveSpeed, Space.World);
-        Jump();
+        HandleJump();
         if (Input.GetKey(KeyCode.A))
         {
             transform.Translate(Vector3.left * Time.deltaTime * sideWaysSpeed);
@@ -39,33 +41,34 @@ public class Player : MonoBehaviour
         {
             transform.Translate(Vector3.left * Time.deltaTime * sideWaysSpeed * -1);
         }
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Space) && verticalState == VerticalState.Idle)
         {
-            isGoingUp = true;
+            verticalState = VerticalState.GoingUp;
         }
-        frameCount += 1;
     }
 
-    void Jump()
+    void HandleJump()
     {
         float x = position.x;
         float y = position.y;
         float z = position.z;
-        if (isGoingUp && y < maxY)
+        if (verticalState == VerticalState.GoingUp && y < maxY)
         {
             transform.Translate(Vector3.up * Time.deltaTime * jumpSpeed);
-        } else if ((isGoingUp && y >= maxY) || (isGoingDown && y > minY))
+        }
+        else if (
+            (verticalState == VerticalState.GoingUp && y >= maxY) ||
+            (verticalState == VerticalState.GoingDown && y > minY))
         {
-            isGoingUp = false;
-            isGoingDown = true;
+            verticalState = VerticalState.GoingDown;
             transform.Translate(Vector3.down * Time.deltaTime * jumpSpeed);
-        } else if (isGoingDown && y <= minY)
+        }
+        else if (verticalState == VerticalState.GoingDown && y <= minY)
         {
             transform.position = new Vector3(x, minY, z);
-            isGoingDown = false;
-            isGoingUp = false;
+            verticalState = VerticalState.Idle;
         }
-        
+
     }
 
     private void OnTriggerEnter(Collider other)
